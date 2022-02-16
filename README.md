@@ -8,6 +8,11 @@ The purpose of this project is to show how to send transactions to ethereum like
 -   A wallet with some MATIC to transact. Can use this [faucet](https://faucet.polygon.technology/)
 -   The wallet's private key and address
 
+# Setup
+
+-   Run `pip install`
+-   Then in the command line `python main.py`
+
 # Environment Variables you will need
 
 Create a file called `.env` and add the following variables:
