@@ -41,7 +41,9 @@ def view_trades(address):
   covey_ledger = w3.eth.contract(address = COVEY_LEDGER_ADDRESS, abi = ledger_info['abi'])
 
   result = covey_ledger.functions.getAnalystContent(address).call()
+
+  # output format ('address', 'position string', unix time),
   print(result)
 
-#post_trades('XRPUSDT:0.2')
-view_trades(WALLET)
+#post_trades('FB:0.2,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
+#view_trades(WALLET)
