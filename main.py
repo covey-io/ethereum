@@ -25,13 +25,13 @@ ledger_info = json.load(f)
 w3 = Web3(Web3.HTTPProvider(f'https://polygon-mumbai.infura.io/v3/{INFURA_PROJECT_ID}'))
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
-def post_trades(tradeString):
+def post_trades(positionString):
   covey_ledger = w3.eth.contract(address = COVEY_LEDGER_ADDRESS, abi = ledger_info['abi'])
   nonce = w3.eth.get_transaction_count(WALLET)
 
-  txn = covey_ledger.functions.createContent(tradeString).buildTransaction({
+  txn = covey_ledger.functions.createContent(positionString).buildTransaction({
     'chainId': int(POLYGON_CHAIN_ID),
-    'gas': 15000000,
+    'gas': 15000000, # can you estimate gas? 
     'nonce': nonce,
   })
   signed_txn = w3.eth.account.sign_transaction(txn, private_key=WALLET_PRIVATE_KEY)
