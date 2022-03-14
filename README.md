@@ -18,13 +18,24 @@ The purpose of this project is to show how to send transactions to ethereum like
 -   Then `pip install -r requirements.txt`
 -   Then in the command line `python main.py`
 
-# Environment Variables you will need
+# Polygon Mainnet Environment Variables (pick either MAINNET or TESTNET)
 
 Create a file called `.env` and add the following variables:
+WALLET = ''
+WALLET_PRIVATE_KEY = ''
+INFURA_PROJECT_ID = ''
 
--   WALLET_PRIVATE_KEY
--   INFURA_PROJECT_ID
--   COVEY_LEDGER_ADDRESS (for polygon testnet the address is `0xAd995FBA14dC6A369faE3c90B81CE0346f4Cf3BC`)
--   WALLET (this is the address of your wallet, it is the private key above)
--   POLYGON_CHAIN_ID (for the polygon testnet it is `80001`)
+INFURA_URL = 'https://polygon-mainnet.infura.io/v3'
+COVEY_LEDGER_ADDRESS = '0x587Ec5a7a3F2DE881B15776BC7aaD97AA44862Be' 
+POLYGON_CHAIN_ID = 137
 
+# Polygon Testnet Environment Variables (pick either MAINNET or TESTNET)
+
+Create a file called `.env` and add the following variables:
+WALLET = ''
+WALLET_PRIVATE_KEY = ''
+INFURA_PROJECT_ID = ''
+
+INFURA_URL = 'https://polygon-mumbai.infura.io/v3'
+COVEY_LEDGER_ADDRESS = '0xAd995FBA14dC6A369faE3c90B81CE0346f4Cf3BC' 
+POLYGON_CHAIN_ID = 80001

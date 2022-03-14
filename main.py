@@ -11,6 +11,7 @@ load_dotenv()
 WALLET = os.getenv('WALLET')
 WALLET_PRIVATE_KEY = os.getenv('WALLET_PRIVATE_KEY')
 INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID')
+INFURA_URL = os.getenv('INFURA_URL')
 COVEY_LEDGER_ADDRESS = os.getenv('COVEY_LEDGER_ADDRESS')
 POLYGON_CHAIN_ID= os.getenv('POLYGON_CHAIN_ID')
 
@@ -22,7 +23,7 @@ f = open('CoveyLedger.json')
 ledger_info = json.load(f)
 
 # You can switch this to polygon "mainnet" by using mainnet.infura instead of mumbai.infura
-w3 = Web3(Web3.HTTPProvider(f'https://polygon-mainnet.infura.io/v3/{INFURA_PROJECT_ID}'))
+w3 = Web3(Web3.HTTPProvider(f'{INFURA_URL}/{INFURA_PROJECT_ID}'))
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 def post_trades(positionString):
@@ -47,5 +48,5 @@ def view_trades(address):
   print(result)
 
 #post_trades('FB:0.2,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
-#view_trades(WALLET)
+view_trades(WALLET)
 
