@@ -5,12 +5,17 @@ The purpose of this project is to show how to send transactions to ethereum like
 # Requirements
 
 -   [Infura Node](https://infura.io/) with the polygon add-on enabled.
--   A wallet with some MATIC to transact. Can use this [faucet](https://faucet.polygon.technology/)
+-   A wallet with some MATIC to transact. For testing, can use this [faucet](https://faucet.polygon.technology/). 
+-    For mainnet buy MATIC on an exchange, 100 trades is $0.25 worth of Matic 
 -   The wallet's private key and address
 
 # Setup
 
 -   Run `pip install`
+-   Create virtual env  `python3 -m venv env`
+-   Activate virtual env `source env/bin/activate`
+-   Should get an (env) in terminal 
+-   Then `pip install -r requirements.txt`
 -   Then in the command line `python main.py`
 
 # Environment Variables you will need
@@ -23,8 +28,3 @@ Create a file called `.env` and add the following variables:
 -   WALLET (this is the address of your wallet, it is the private key above)
 -   POLYGON_CHAIN_ID (for the polygon testnet it is `80001`)
 
-# To run first time 
--  create virtual env  `python3 -m venv env`
--  activate virtual env `source env/bin/activate`
--  should get an (env) in terminal 
--  Then `pip install -r requirements.txt`
