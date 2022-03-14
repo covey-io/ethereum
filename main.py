@@ -21,8 +21,8 @@ f = open('CoveyLedger.json')
 # a dictionary
 ledger_info = json.load(f)
 
-# You can switch this to polygon "mainnet" by using matic.infura instead of mumbai
-w3 = Web3(Web3.HTTPProvider(f'https://polygon-mumbai.infura.io/v3/{INFURA_PROJECT_ID}'))
+# You can switch this to polygon "mainnet" by using mainnet.infura instead of mumbai.infura
+w3 = Web3(Web3.HTTPProvider(f'https://polygon-mainnet.infura.io/v3/{INFURA_PROJECT_ID}'))
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 def post_trades(positionString):
@@ -41,9 +41,11 @@ def post_trades(positionString):
 
 def view_trades(address):
   covey_ledger = w3.eth.contract(address = COVEY_LEDGER_ADDRESS, abi = ledger_info['abi'])
-  result = covey_ledger.functions.getAnalystContent(address).call()
+  my_address = w3.toChecksumAddress(address)
+  result = covey_ledger.functions.getAnalystContent(my_address).call()
   # output format [('address', 'position string', unix time),('address', 'position string', unix time),...]
   print(result)
 
 #post_trades('FB:0.2,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
-view_trades('0x64E86EeA7fa78639a42D8684e13dfE0cb9069c81')
+#view_trades(WALLET)
+
