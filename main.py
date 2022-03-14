@@ -29,9 +29,11 @@ def post_trades(positionString):
   covey_ledger = w3.eth.contract(address = COVEY_LEDGER_ADDRESS, abi = ledger_info['abi'])
   nonce = w3.eth.get_transaction_count(WALLET)
 
+  gas = covey_ledger.functions.createContent(positionString).estimateGas({'from': WALLET, 'nonce': nonce})
+
   txn = covey_ledger.functions.createContent(positionString).buildTransaction({
     'chainId': int(POLYGON_CHAIN_ID),
-    'gas': 15000000, # can you estimate gas? 
+    'gas': gas,
     'nonce': nonce,
   })
   signed_txn = w3.eth.account.sign_transaction(txn, private_key=WALLET_PRIVATE_KEY)
