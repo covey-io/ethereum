@@ -18,7 +18,7 @@ The purpose of this project is to show how to send transactions to ethereum like
 -   Then `pip install -r requirements.txt`
 -   Then in the command line `python main.py`
 
-# Polygon Mainnet Environment Variables (pick either MAINNxT or TESTNET)
+# Polygon Mainnet Env Var (pick either MAINNxT or TESTNET)
 
 Create a file called `.env` and add the following variables:
 WALLET = ''
@@ -29,7 +29,7 @@ INFURA_URL = 'https://polygon-mainnet.infura.io/v3'
 COVEY_LEDGER_ADDRESS = '0x587Ec5a7a3F2DE881B15776BC7aaD97AA44862Be' 
 POLYGON_CHAIN_ID = 137
 
-# Polygon Testnet Environment Variables (pick either MAINNET or TESTNET)
+# Polygon Testnet Env Var (pick either MAINNET or TESTNET)
 
 Create a file called `.env` and add the following variables:
 WALLET = ''
