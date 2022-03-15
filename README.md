@@ -44,12 +44,12 @@ POLYGON_CHAIN_ID = 80001
 
 -   Install [geth](https://geth.ethereum.org/)
 -   Run geth in your command line by using the command `geth` [More info here](https://geth.ethereum.org/docs/interface/command-line-options)
--   Run the Javascript console by running `geth console` on windows I recommend `geth attach ipc:\\.\pipe\geth.ipc`
--   Load the account generation script by running `loadScript("./accountGenerator.js")` while inside this directory in the command line
--   Now run `generateAccounts` with the desired number of accounts and a password. So if you want to generate 50 accounts with the password of "password" do `generateNewAccounts("password",50)`
--   It will print the address of the accounts. I would copy and save this in a text file
+-   Run the Javascript console by running `geth console` on windows I recommend `geth attach ipc:\\.\pipe\geth.ipc` or on mac `geth attach`
+-   Load the account generation script by running `loadScript("./accountGenerator.js")` while inside this directory in the command line. response will be undefined
+-   Now run generateAccounts with the desired number of accounts and a password. So if you want to generate 50 accounts with the password of "password" do `generateNewAccounts("password",50)`
+-   It will print the public address of the accounts. I would copy and save this in a text file
 -   Alternatively you can run `geth account list` in the command line
 -   In `main.py` you can use `get_private_keys` to list all the private keys for all your accounts
 -   Alternatively you can use `get_private_key` to list the private key for a given address
 -   Once you choose a private key and an address, set these to the `WALLET` and `WALLET_PRIVATE_KEY` env vars or edit the code to use the given hardcoded values.
--   Make sure to give yor new account some MATIC using a [faucet](https://faucet.polygon.technology/)
+-   Make sure to give buy some MATIC or if you are on testnet give your new account some MATIC using a [faucet](https://faucet.polygon.technology/) 

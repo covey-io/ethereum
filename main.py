@@ -84,9 +84,11 @@ def get_private_key(address, password):
   public_key_str = str(public_key)
   print(private_key_str)
 
-post_trades('FB:0.2,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
+#post_trades('FB:0.2,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
 #view_trades(WALLET)
 #get_private_keys("password")
-#get_private_key("0xac87bbb4d36117b43e582fb98e39d2072293eb80", "password")
+#get_private_key("0xd3170f3405782d38fbf9ccb291e143b9702c0659", "password")
+#get_private_key("0x1aba07fe746e690d917117315cd42c6dad6cb4c6", "password")
+
 
 
