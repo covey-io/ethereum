@@ -72,9 +72,9 @@ def calculate_portfolio(address,startCash):
                                       "net_traded_percent", "unrealized_long_pnl", "unrealized_short_pnl",
                                       "unrealized_pnl",
                                       "realized_long_pnl", "realized_short_pnl", "realized_pnl",
-                                      "total_long_pnl", "total_short_pnl", "total_pnl","marker"])
+                                      "total_long_pnl", "total_short_pnl", "total_pnl"])
 
-    firstRow = {"date_time": firstTrade, "user_id": userId, "cash": startCash, "usd_value": startCash, "positions_usd": 0,
+    firstRow = {"date_time": firstTrade, "user_id": address, "cash": startCash, "usd_value": startCash, "positions_usd": 0,
                 "inception_return": 1.0, "gross_exposure_usd": 0.0, "long_exposure_usd": 0.0,
                 "short_exposure_usd": 0.0, "net_exposure_usd": 0.0, "gross_exposure_percent": 0.0,
                 "long_exposure_percent": 0.0, "short_exposure_percent": 0.0, "net_exposure_percent": 0.0,
@@ -82,7 +82,7 @@ def calculate_portfolio(address,startCash):
                 "net_traded_percent": 0.0, "unrealized_long_pnl": 0.0, "unrealized_short_pnl": 0.0,
                 "unrealized_pnl": 0.0,
                 "realized_long_pnl": 0.0, "realized_short_pnl": 0.0, "realized_pnl": 0.0,
-                "total_long_pnl": 0.0, "total_short_pnl": 0.0, "total_pnl": 0.0,"marker":'FIRST'}
+                "total_long_pnl": 0.0, "total_short_pnl": 0.0, "total_pnl": 0.0}
     
     
     ''' CALCULATE PORTFOLIO HERE '''
