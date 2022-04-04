@@ -24,6 +24,7 @@ lru-dict
 multiaddr
 multidict
 netaddr
+pandas
 parsimonious
 protobuf
 pycryptodome

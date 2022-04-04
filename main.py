@@ -47,13 +47,6 @@ def post_trades(positionString):
   signed_txn = w3.eth.account.sign_transaction(txn, private_key=WALLET_PRIVATE_KEY)
   w3.eth.send_raw_transaction(signed_txn.rawTransaction)  
 
-def view_trades(address):
-  covey_ledger = w3.eth.contract(address = COVEY_LEDGER_ADDRESS, abi = ledger_info['abi'])
-  my_address = w3.toChecksumAddress(address)
-  result = covey_ledger.functions.getAnalystContent(my_address).call()
-  # output format [('address', 'position string', unix time),('address', 'position string', unix time),...]
-  print(result)
-
 # The password here MUST match the password you used to generate your accounts, otherwise it will fail
 def get_private_keys(password):
   wallets_list = gethWeb3.geth.personal.list_wallets()
@@ -84,8 +77,9 @@ def get_private_key(address, password):
   public_key_str = str(public_key)
   print(private_key_str)
 
+
+
 #post_trades('FB:0.2,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
-#view_trades(WALLET)
 #get_private_keys("password")
 #get_private_key("0xd3170f3405782d38fbf9ccb291e143b9702c0659", "password")
 #get_private_key("0x1aba07fe746e690d917117315cd42c6dad6cb4c6", "password")
