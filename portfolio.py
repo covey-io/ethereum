@@ -13,8 +13,12 @@ load_dotenv()
 WALLET = os.getenv('WALLET')
 INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID')
 INFURA_URL = os.getenv('INFURA_URL')
-COVEY_LEDGER_ADDRESS = os.getenv('COVEY_LEDGER_ADDRESS')
 POLYGON_CHAIN_ID= os.getenv('POLYGON_CHAIN_ID')
+COVEY_LEDGER_POLYGON_ADDRESS = os.getenv('COVEY_LEDGER_POLYGON_ADDRESS')
+
+COVEY_LEDGER_SKALE_ADDRESS = os.getenv('COVEY_LEDGER_SKALE_ADDRESS')
+SKALE_URL = os.getenv('SKALE_URL')
+
 IEX_TOKEN = os.getenv('IEX_TOKEN')
 
 # Opening JSON file
@@ -24,24 +28,24 @@ f = open('CoveyLedger.json')
 # a dictionary
 ledger_info = json.load(f)
 
-# You can switch this to polygon "mainnet" by using mainnet.infura instead of mumbai.infura
-w3 = Web3(Web3.HTTPProvider(f'{INFURA_URL}/{INFURA_PROJECT_ID}'))
-w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
-# Geth web3 for account stuff
-gethWeb3 = Web3(Web3.IPCProvider())
-
-
-def view_trades(address):
-    
-    '''JOHN ADD SKALE EXPLORER FOR TRADES HERE'''
-
-
-  covey_ledger = w3.eth.contract(address = COVEY_LEDGER_ADDRESS, abi = ledger_info['abi'])
-  my_address = w3.toChecksumAddress(address)
-  result = covey_ledger.functions.getAnalystContent(my_address).call()
+def view_trades_skale(address):
+    w3 = Web3(Web3.HTTPProvider(SKALE_URL))
+    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+    covey_ledger = w3.eth.contract(address = COVEY_LEDGER_SKALE_ADDRESS, abi = ledger_info['abi'])
+    my_address = w3.toChecksumAddress(address)
+    result = covey_ledger.functions.getAnalystContent(my_address).call()
   # output format [('address', 'position string', unix time),('address', 'position string', unix time),...]
-  print(result)
+    print(result)
+
+def view_trades_polygon(address):
+    w3 = Web3(Web3.HTTPProvider(f'{INFURA_URL}/{INFURA_PROJECT_ID}'))
+    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+    covey_ledger = w3.eth.contract(address = COVEY_LEDGER_POLYGON_ADDRESS, abi = ledger_info['abi'])
+    my_address = w3.toChecksumAddress(address)
+    result = covey_ledger.functions.getAnalystContent(my_address).call()
+  # output format [('address', 'position string', unix time),('address', 'position string', unix time),...]
+    print(result)
 
 
 def get_prices(symbols,exactDate):   
@@ -91,5 +95,6 @@ def calculate_portfolio(address,startCash):
     return portfolio     
 
 
-#view_trades(WALLET)
+view_trades_skale('0x41da2035ac26e4308b624a84d3caebf80a4dccf1')
+#view_trades_polygon('0xf66ad6e503f8632c85c82027c9df12fae205e916')
 #get_prices(['FB'],'2022-03-29')
