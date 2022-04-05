@@ -57,11 +57,11 @@ def post_trades_skale(positionString):
   my_address = w3.toChecksumAddress(WALLET)
   nonce = w3.eth.get_transaction_count(my_address)
 
-  gas = covey_ledger.functions.createContent(positionString).estimateGas({'from': my_address, 'nonce': nonce})
+  #gas = covey_ledger.functions.createContent(positionString).estimateGas({'from': my_address, 'nonce': nonce})
 
   txn = covey_ledger.functions.createContent(positionString).buildTransaction({
     'chainId': int(SKALE_CHAIN_ID),
-    'gas': gas,
+    'gas': 21000,
     'nonce': nonce,
     'from': my_address
   })
