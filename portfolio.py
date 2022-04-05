@@ -13,7 +13,9 @@ load_dotenv()
 WALLET = os.getenv('WALLET')
 INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID')
 INFURA_URL = os.getenv('INFURA_URL')
+SKALE_URL = os.getenv('SKALE_URL')
 COVEY_LEDGER_ADDRESS = os.getenv('COVEY_LEDGER_ADDRESS')
+COVEY_LEDGER_POLYGON_ADDRESS = os.getenv('COVEY_LEDGER_POLYGON_ADDRESS')
 POLYGON_CHAIN_ID= os.getenv('POLYGON_CHAIN_ID')
 IEX_TOKEN = os.getenv('IEX_TOKEN')
 
@@ -24,8 +26,13 @@ f = open('CoveyLedger.json')
 # a dictionary
 ledger_info = json.load(f)
 
-# You can switch this to polygon "mainnet" by using mainnet.infura instead of mumbai.infura
-w3 = Web3(Web3.HTTPProvider(f'{INFURA_URL}/{INFURA_PROJECT_ID}'))
+# You can switch to SKALE by commenting line 29,33 and uncommenting line 31,34
+url = f'{INFURA_URL}/{INFURA_PROJECT_ID}'
+#url = SKALE_URL
+
+ledger = COVEY_LEDGER_POLYGON_ADDRESS
+#ledger = COVEY_LEDGER_ADDRESS
+w3 = Web3(Web3.HTTPProvider(url))
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 # Geth web3 for account stuff
@@ -34,7 +41,7 @@ gethWeb3 = Web3(Web3.IPCProvider())
 
 def view_trades(address):
     
-    '''JOHN ADD SKALE EXPLORER FOR TRADES HERE'''
+  '''JOHN ADD SKALE EXPLORER FOR TRADES HERE'''
 
 
   covey_ledger = w3.eth.contract(address = COVEY_LEDGER_ADDRESS, abi = ledger_info['abi'])
