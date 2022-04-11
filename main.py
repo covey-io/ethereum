@@ -10,12 +10,12 @@ import json
 
 load_dotenv()
 
-WALLET = os.getenv('WALLET')
+WALLET = os.getenv('WALLET') #public key 
 WALLET_PRIVATE_KEY = os.getenv('WALLET_PRIVATE_KEY')
-INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID')
-INFURA_URL = os.getenv('INFURA_URL')
-POLYGON_CHAIN_ID= os.getenv('POLYGON_CHAIN_ID')
-COVEY_LEDGER_POLYGON_ADDRESS = os.getenv('COVEY_LEDGER_POLYGON_ADDRESS')
+INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID') #set up an account with infura, it's free, toggle polychain to be on. 
+INFURA_URL = os.getenv('INFURA_URL') #'https://polygon-mainnet.infura.io/v3'
+POLYGON_CHAIN_ID= os.getenv('POLYGON_CHAIN_ID') #137
+COVEY_LEDGER_POLYGON_ADDRESS = os.getenv('COVEY_LEDGER_POLYGON_ADDRESS') #"0x587Ec5a7a3F2DE881B15776BC7aaD97AA44862Be"
 
 COVEY_LEDGER_SKALE_ADDRESS = os.getenv('COVEY_LEDGER_SKALE_ADDRESS')
 SKALE_URL = os.getenv('SKALE_URL')
@@ -100,7 +100,7 @@ def get_private_key(address, password):
 
 
 
-post_trades_polygon('FB:0.2,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
+#post_trades_polygon('FB:0.1,FNF:0.2,BTCUSDT:0.2,FNV:0.2,PLTR:0.2,GPS:0.2')
 #get_private_keys("password")
 #get_private_key("0xd3170f3405782d38fbf9ccb291e143b9702c0659", "password")
 #get_private_key("0x1aba07fe746e690d917117315cd42c6dad6cb4c6", "password")

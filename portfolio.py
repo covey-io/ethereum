@@ -95,6 +95,7 @@ def calculate_portfolio(address,startCash):
     return portfolio     
 
 
-view_trades_skale('0x41da2035ac26e4308b624a84d3caebf80a4dccf1')
-#view_trades_polygon('0xf66ad6e503f8632c85c82027c9df12fae205e916')
+#view_trades_skale('0x27dccb702d68039a5895a8d371f547bed471c68c') # comtest5
+view_trades_skale('0x0d97A0E7e42eB70d013a2a94179cEa0E815dAE41')
+view_trades_polygon('0x0d97A0E7e42eB70d013a2a94179cEa0E815dAE41')
 #get_prices(['FB'],'2022-03-29')
