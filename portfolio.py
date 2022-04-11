@@ -80,26 +80,11 @@ def calculate_portfolio(address,startCash):
 
     ''' FILL in prices here from tradingKey '''
 
-    portfolio = pd.DataFrame(columns=["date_time", "user_id", "cash", "usd_value", "positions_usd",
-                                      "inception_return", "gross_exposure_usd", "long_exposure_usd",
-                                      "short_exposure_usd", "net_exposure_usd", "gross_exposure_percent",
-                                      "long_exposure_percent", "short_exposure_percent", "net_exposure_percent",
-                                      "gross_traded_usd", "net_traded_usd", "gross_traded_percent",
-                                      "net_traded_percent", "unrealized_long_pnl", "unrealized_short_pnl",
-                                      "unrealized_pnl",
-                                      "realized_long_pnl", "realized_short_pnl", "realized_pnl",
-                                      "total_long_pnl", "total_short_pnl", "total_pnl"])
+    portfolio = pd.DataFrame(columns=["date_time", "address", "cash", "usd_value", 
+                                      "inception_return"])
 
-    firstRow = {"date_time": firstTrade, "user_id": address, "cash": startCash, "usd_value": startCash, "positions_usd": 0,
-                "inception_return": 1.0, "gross_exposure_usd": 0.0, "long_exposure_usd": 0.0,
-                "short_exposure_usd": 0.0, "net_exposure_usd": 0.0, "gross_exposure_percent": 0.0,
-                "long_exposure_percent": 0.0, "short_exposure_percent": 0.0, "net_exposure_percent": 0.0,
-                "gross_traded_usd": 0.0, "net_traded_usd": 0.0, "gross_traded_percent": 0.0,
-                "net_traded_percent": 0.0, "unrealized_long_pnl": 0.0, "unrealized_short_pnl": 0.0,
-                "unrealized_pnl": 0.0,
-                "realized_long_pnl": 0.0, "realized_short_pnl": 0.0, "realized_pnl": 0.0,
-                "total_long_pnl": 0.0, "total_short_pnl": 0.0, "total_pnl": 0.0}
-    
+    firstRow = {"date_time": firstTrade, "address": address, "cash": startCash, "usd_value": startCash, 
+                "inception_return": 1.0}
     
     ''' CALCULATE PORTFOLIO HERE from tradingKey and prices '''
     
