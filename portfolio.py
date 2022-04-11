@@ -61,6 +61,7 @@ def get_prices(symbols,exactDate):
         url = root_url+urlVersion+method+'&token='+IEX_TOKEN+'&exactDate='+exactDate
         data = json.loads(requests.get(url).text)
         quotes.update(data)
+    print(quotes)
     return quotes 
 
 
@@ -94,8 +95,9 @@ def calculate_portfolio(address,startCash):
     
     return portfolio     
 
-
-#view_trades_skale('0x27dccb702d68039a5895a8d371f547bed471c68c') # comtest5
-view_trades_skale('0x0d97A0E7e42eB70d013a2a94179cEa0E815dAE41')
-view_trades_polygon('0x0d97A0E7e42eB70d013a2a94179cEa0E815dAE41')
-#get_prices(['FB'],'2022-03-29')
+# Wallet One 
+#view_trades_skale('0x41da2035ac26e4308b624a84d3caebf80a4dccf1') 
+# Wallet Two 
+#view_trades_skale('0x211fe601e24ce89cb443356f687c67fbf7708412')
+# Price Pull
+#get_prices(['FB','GOOGL'],'2022-03-29')
