@@ -67,7 +67,18 @@ def get_prices(symbols,exactDate):
 
 def calculate_portfolio(address,startCash):
 
-    trades = view_trades(address)
+    trades = view_trades_skale(address)
+    
+    tradingKey = pd.DataFrame(columns=["id", "entry_price", "entry_date", "market_entry_date", "symbol", "percent", "current_position", 
+    "adjusted_entry", "prior_portfolio_value", "target_position_value", "prior_position_value", "cash_used", 
+    "share_count", "prior_cumulative_share_count", "post_cumulative_share_count", "status", "posted_on_chain", 
+    "address", "realized_profit", "exchange", "delayed_trade_date", "currency"]
+    
+    ''' FILL IN tradingKey here from trades'''
+
+    prices = pd.DataFrame(columns=["id", "date_time", "price", "symbol"]
+
+    ''' FILL in prices here from tradingKey '''
 
     portfolio = pd.DataFrame(columns=["date_time", "user_id", "cash", "usd_value", "positions_usd",
                                       "inception_return", "gross_exposure_usd", "long_exposure_usd",
@@ -90,14 +101,13 @@ def calculate_portfolio(address,startCash):
                 "total_long_pnl": 0.0, "total_short_pnl": 0.0, "total_pnl": 0.0}
     
     
-    ''' CALCULATE PORTFOLIO HERE '''
+    ''' CALCULATE PORTFOLIO HERE from tradingKey and prices '''
     
-    
-    return portfolio     
+    return tradkingKey, prices, portfolio
 
-# Wallet One 
+# Address One 
 #view_trades_skale('0x41da2035ac26e4308b624a84d3caebf80a4dccf1') 
-# Wallet Two 
+# Address Two 
 #view_trades_skale('0x211fe601e24ce89cb443356f687c67fbf7708412')
 # Price Pull
 #get_prices(['FB','GOOGL'],'2022-03-29')
