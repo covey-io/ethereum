@@ -51,9 +51,9 @@ def calculate_portfolio(address,startCash):
     trades = view_trades_skale(address)
     
     tradingKey = pd.DataFrame(columns=["id", "entry_price", "entry_date", "market_entry_date", "symbol", "percent", "current_position", 
-    "adjusted_entry", "prior_portfolio_value", "target_position_value", "prior_position_value", "cash_used", 
-    "share_count", "prior_cumulative_share_count", "post_cumulative_share_count", "status", "posted_on_chain", 
-    "address", "realized_profit", "exchange", "delayed_trade_date", "currency"])
+    "split_adjusted_entry", "prior_portfolio_value", "target_position_value", "prior_position_value", "cash_used", 
+    "share_count", "prior_cumulative_share_count", "post_cumulative_share_count", "status", 
+    "address", "realized_profit"])
     
     '''FILL IN tradingKey here from trades'''
 
