@@ -1,0 +1,8 @@
+,id,entry_price,entry_date,market_entry_date,symbol,percent,current_position,split_adjusted_entry,prior_portfolio_value,target_position_value,prior_position_value,cash_used,share_count,prior_cumulative_share_count,post_cumulative_share_count,status,address,realized_profit
+0,,,2022-02-14 15:21:38,,FB,0.4,,,,,,,,,,,0x69039065803a14116f427fa82e53a172d9425663,
+1,,,2022-02-14 15:21:38,,AAPL,0.22,,,,,,,,,,,0x69039065803a14116f427fa82e53a172d9425663,
+2,,,2022-02-15 18:22:59,,FB,0.22,,,,,,,,,,,0x69039065803a14116f427fa82e53a172d9425663,
+3,,,2022-02-27 20:50:29,,FB,0.33,,,,,,,,,,,0x69039065803a14116f427fa82e53a172d9425663,
+4,,,2022-02-27 20:50:47,,AAPL,0.43,,,,,,,,,,,0x69039065803a14116f427fa82e53a172d9425663,
+5,,,2022-02-27 20:51:12,,AAPL,0.22,,,,,,,,,,,0x69039065803a14116f427fa82e53a172d9425663,
+6,,,2022-02-27 20:52:48,,FB,0.22,,,,,,,,,,,0x69039065803a14116f427fa82e53a172d9425663,
