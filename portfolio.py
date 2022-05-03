@@ -77,33 +77,36 @@ def createTickerTable(address):
     "share_count", "prior_cumulative_share_count", "post_cumulative_share_count", "status", 
     "address", "realized_profit"])
 
-  trade_ledger = pd.DataFrame({'symbol':[], 'size':[], 'date_time':[], 'date_time_utc':[]})
+  trade_ledger = pd.DataFrame({'symbol':[], 'percent':[], 'date_time':[], 'entry_date':[]})
   trades = view_trades_skale(address) 
-  portfolio_num = 1
   for i in range(len(trades)):
       length_temp = len(trades[i][1].split(','))
-      daily_trade_ledger = pd.DataFrame({'symbol':[None]*length_temp, 'size':[None]*length_temp, 'date_time':[None]*length_temp})    
+      daily_trade_ledger = pd.DataFrame({'symbol':[None]*length_temp, 'percent':[None]*length_temp, 'date_time':[None]*length_temp})    
       for j in range(len(trades[i][1].split(','))):
           daily_trade_ledger.iloc[j,0] = trades[i][1].split(',')[j].split(':')[0]        
           daily_trade_ledger.iloc[j,1]  = trades[i][1].split(',')[j].split(':')[1]
           daily_trade_ledger.iloc[j,2]  = trades[i][2]
       trade_ledger = pd.concat([trade_ledger, daily_trade_ledger ])
   trade_ledger.rename(columns= {'date_time': 'date_time_unix'}, inplace=True)    
-  trade_ledger.date_time_utc = [datetime.datetime.fromtimestamp(i) for i in trade_ledger.date_time_unix]
+  trade_ledger.entry_date = [datetime.datetime.fromtimestamp(i) for i in trade_ledger.date_time_unix]
   
-  trade_ledger.date_time_utc = pd.to_datetime(trade_ledger.date_time_utc, utc=True)
-  trade_ledger.Size = pd.to_numeric(trade_ledger.size)
+  trade_ledger.entry_date = pd.to_datetime(trade_ledger.entry_date, utc=True)
+  trade_ledger.percent = pd.to_numeric(trade_ledger.percent)
   # we round up our time to prevent look ahead bias
-  trade_ledger['date_time_utc_full_hour'] = trade_ledger['date_time_utc'].dt.ceil('60min')
-  trade_ledger.to_csv(f'trade_ledger_{portfolio_num}.csv')
-  
-  return trade_ledger
+  #trade_ledger['date_time_utc_full_hour'] = trade_ledger['entry_date'].dt.ceil('60min')
+  #trade_ledger.to_csv(f'trade_ledger_{portfolio_num}.csv')
+  tradingKey = pd.concat([trade_ledger, tradingKey ])
+  tradingKey.drop(['date_time_unix'], axis=1,inplace=True)
+  tradingKey['address'] = address
+  tradingKey['id'] = tradingKey.index
+  tradingKey.set_index('id',inplace=True)
+  return tradingKey
 
 # user_id 30
 #OLD: 
-createTickerTable('0x7508438ff36b72fc07b044b6a88fd57dbe4cf633').to_csv('tradingKeyOldSwingAdj.csv')
+#createTickerTable('0x41da2035ac26e4308b624a84d3caebf80a4dccf1').to_csv('tradingKeyOne.csv')
 #NEW: 
-createTickerTable('0x0d97A0E7e42eB70d013a2a94179cEa0E815dAE41').to_csv('tradingKeyNewSwingAdj.csv')
+#createTickerTable('0x211fe601e24ce89cb443356f687c67fbf7708412').to_csv('tradingKeyTwo.csv')
 #print(view_trades_skale('0xaa7f0957a2ea0c07f75950bb8006240480a9d913') )
 # Address Two 
 #view_trades_skale('0x211fe601e24ce89cb443356f687c67fbf7708412')
