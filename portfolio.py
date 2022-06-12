@@ -18,6 +18,7 @@ INFURA_URL = os.getenv('INFURA_URL')
 POLYGON_CHAIN_ID= os.getenv('POLYGON_CHAIN_ID')
 COVEY_LEDGER_POLYGON_ADDRESS = os.getenv('COVEY_LEDGER_POLYGON_ADDRESS')
 
+
 COVEY_LEDGER_SKALE_ADDRESS = os.getenv('COVEY_LEDGER_SKALE_ADDRESS')
 SKALE_URL = os.getenv('SKALE_URL')
 
@@ -37,20 +38,23 @@ def view_trades_skale(address):
     my_address = w3.toChecksumAddress(address)
     result = covey_ledger.functions.getAnalystContent(my_address).call()
   # output format [('address', 'position string', unix time),('address', 'position string', unix time),...]
+    print(result)
     return result
 
 def view_trades_polygon(address):
     w3 = Web3(Web3.HTTPProvider(f'{INFURA_URL}/{INFURA_PROJECT_ID}'))
     w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-    covey_ledger = w3.eth.contract(address = COVEY_LEDGER_POLYGON_ADDRESS, abi = ledger_info['abi'])
+    LEDGER_POLYGON_ADDRESS = w3.toChecksumAddress(COVEY_LEDGER_POLYGON_ADDRESS)
+    covey_ledger = w3.eth.contract(address = LEDGER_POLYGON_ADDRESS, abi = ledger_info['abi'])
     my_address = w3.toChecksumAddress(address)
     result = covey_ledger.functions.getAnalystContent(my_address).call()
   # output format [('address', 'position string', unix time),('address', 'position string', unix time),...]
+    print(result)
     return result
 
 def calculate_portfolio(address,startCash):
 
-    trades = view_trades_skale(address)
+    trades = view_trades_polygon(address)
     
     tradingKey = pd.DataFrame(columns=["id", "entry_price", "entry_date", "market_entry_date", "symbol", "percent", "current_position", 
     "split_adjusted_entry", "prior_portfolio_value", "target_position_value", "prior_position_value", "cash_used", 
@@ -78,7 +82,7 @@ def createTickerTable(address):
     "address", "realized_profit"])
 
   trade_ledger = pd.DataFrame({'symbol':[], 'percent':[], 'date_time':[], 'entry_date':[]})
-  trades = view_trades_skale(address) 
+  trades = view_trades_polygon(address) 
   for i in range(len(trades)):
       length_temp = len(trades[i][1].split(','))
       daily_trade_ledger = pd.DataFrame({'symbol':[None]*length_temp, 'percent':[None]*length_temp, 'date_time':[None]*length_temp})    
@@ -102,14 +106,7 @@ def createTickerTable(address):
   tradingKey.set_index('id',inplace=True)
   return tradingKey
 
-# user_id 30
-#OLD: 
-#createTickerTable('0x41da2035ac26e4308b624a84d3caebf80a4dccf1').to_csv('tradingKeyOne.csv')
-#NEW: 
-#createTickerTable('0x211fe601e24ce89cb443356f687c67fbf7708412').to_csv('tradingKeyTwo.csv')
-#print(view_trades_skale('0xaa7f0957a2ea0c07f75950bb8006240480a9d913') )
-# Address Two 
-#view_trades_skale('0x211fe601e24ce89cb443356f687c67fbf7708412')
-# Price Pull
-#print(pd.read_csv('prices.csv'))
 
+#view_trades_polygon('0x41da2035ac26e4308b624a84d3caebf80a4dccf1')
+#
+#view_trades_skale('0x41da2035ac26e4308b624a84d3caebf80a4dccf1')
