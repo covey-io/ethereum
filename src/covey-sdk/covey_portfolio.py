@@ -7,7 +7,7 @@ from datetime import date, datetime,timedelta
 
 # covey libraries
 from covey_trade import Trade
-import covey_checks as covey_checks
+import covey_checks 
 from covey_calendar import CoveyCalendar
 
 
