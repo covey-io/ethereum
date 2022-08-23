@@ -7,7 +7,7 @@ env/
 build/
 dist/
 src/*.egg-info/
-
+.archive
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

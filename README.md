@@ -1,55 +1,45 @@
-# Covey-ethereum
 
-The purpose of this project is to show how to send transactions to ethereum like networks, in this case POLYGON
+# Getting Started
+***
+1. C++ Build Tools (in case not already on your machine - frequently seen with Windows Users)
+[download here](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
 
-# Requirements
+2. Create a project folder in your file system **folder_name**
 
--   [Infura Node](https://infura.io/) with the polygon add-on enabled.
--   A wallet with some MATIC to transact. For testing, can use this [faucet](https://faucet.polygon.technology/).
--   For mainnet buy MATIC on an exchange, 100 trades is $0.25 worth of Matic
--   The wallet's private key and address
+3. Using the terminal of your choice, create a virtual python environment within **folder_name**.
 
-# Setup
+> `python3 -m venv env` [^1]
+    
+4. Activate the virtual environment.
 
--   Run `pip install`
--   Create virtual env `python3 -m venv env`
--   Activate virtual env `source env/bin/activate`
--   Should get an (env) in terminal
--   Then `pip install -r requirements.txt`
--   Then in the command line `python main.py`
+> windows `source env/Scripts/Activate` [^2]
+> mac `source env/bin/activate` [^2]
+ 
 
-# Polygon Mainnet Env Var
+5. Once the environment is activated (the terminal should have the environment name pop up in front of the user name as **(env)**), proceed to install the covey-sdk.
+> `pip install covey-sdk`
 
-Create a file called `.env` and add the following variables:
-WALLET = ''
-WALLET_PRIVATE_KEY = ''
-INFURA_PROJECT_ID = ''
+6. If there are no errors, you are ready to open the project in Visual Studio Code.
+- Open VS Code and go to **File > Open Folder** *(choose the project)*.
+- Make sure the **env/** folder is visible in the project structure.
 
-INFURA_URL = 'https://polygon-mainnet.infura.io/v3'
-COVEY_LEDGER_ADDRESS = '0x587Ec5a7a3F2DE881B15776BC7aaD97AA44862Be' 
-POLYGON_CHAIN_ID = 137
+7.  Although it should be a default, make sure the proper interpreter is selected from the **env/** folder
+- Click `Ctrl + Shift + P` and type in **Python : Select Interpreter** in the drop down.
+- The proper interpreter will be in the **env/scripts** folder and will have a star next to it.
 
-# Polygon Testnet Env Var 
+8. Create a new file called test.py or whichever name you would prefer and run the following code
 
-Create a file called `.env` and add the following variables:
-WALLET = ''
-WALLET_PRIVATE_KEY = ''
-INFURA_PROJECT_ID = ''
+    `import covey.covey_trade as ct`
+    `t = ct.Trade(address = <public wallet key>, address_private = <private_wallet_key>, posting_only = True)`
+    `t.post_trades_polygon('FB:0.25')`
 
-INFURA_URL = 'https://polygon-mumbai.infura.io/v3'
-COVEY_LEDGER_ADDRESS = '0xAd995FBA14dC6A369faE3c90B81CE0346f4Cf3BC' 
-POLYGON_CHAIN_ID = 80001
+[^1]: note you can call it env or venv just something conventional to remember, also important to use the command **python3** to make sure the proper version is installed in the virtual environment.
 
-# Generating accounts for use with this repo
+[^2]: again note that 'env' is just a name we used to name our virtual environment. You can call it covey_env or something custom if you wish.
 
--   Install [geth](https://geth.ethereum.org/)
--   Run geth in your command line by using the command `geth` [More info here](https://geth.ethereum.org/docs/interface/command-line-options)
--   Run the Javascript console by running `geth console` on windows I recommend `geth attach ipc:\\.\pipe\geth.ipc` or on mac `geth attach`
--   Load the account generation script by running `loadScript("./accountGenerator.js")` while inside this directory in the command line. response will be undefined
--   Now run generateAccounts with the desired number of accounts and a password. So if you want to generate 50 accounts with the password of "password" do `generateNewAccounts("password",50)`
--   It will print the public address of the accounts. I would copy and save this in a text file
--   Alternatively you can run `geth account list` in the command line
--   In `main.py` you can use `get_private_keys` to list all the private keys for all your accounts
--   Alternatively you can use `get_private_key` to list the private key for a given address
--   Once you choose a private key and an address, set these to the `WALLET` and `WALLET_PRIVATE_KEY` env vars or edit the code to use the given hardcoded values.
--   Make sure to give buy some MATIC or if you are on testnet give your new account some MATIC using a [faucet](https://faucet.polygon.technology/) 
+
+9. Note the post trades string needs to be one string with the format '<ticker>:<allocation>,<ticker>:<allocation>,...'
+
+If successful, the terminal should write back that your trades have been posted.
+
+Please let us know if you have any questions or run into issues, happy coding!

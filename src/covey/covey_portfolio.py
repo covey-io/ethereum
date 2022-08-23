@@ -124,7 +124,7 @@ class Portfolio(Trade):
         self.export_to_csv(key = 'position', df = df)
 
         # dividend logic 
-        dividends_df = pd.read_csv('data/dividend_split.csv')
+        dividends_df = pd.read_csv('src/covey/data/dividend_split.csv')
         dividends_df['payment_date'] = pd.to_datetime(dividends_df['payment_date'])
         dividends_df = dividends_df[(dividends_df['div_or_split'] == 'dividend') & (dividends_df['payment_date'] == portfolio_date)][['symbol','amount']]
         
@@ -137,7 +137,7 @@ class Portfolio(Trade):
         df['dividend_cash'].fillna(0,inplace=True)
 
         # split logic
-        splits_df = pd.read_csv('data/dividend_split.csv')
+        splits_df = pd.read_csv('src/covey/data/dividend_split.csv')
         splits_df['payment_date'] = pd.to_datetime(splits_df['payment_date'])
         splits_df = splits_df[(splits_df['div_or_split'] == 'split') & (splits_df['payment_date'] == portfolio_date)][['symbol', 'amount']]
         df = pd.merge(left=df, right=splits_df, on = 'symbol', how='left')

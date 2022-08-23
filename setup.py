@@ -7,6 +7,9 @@ with open("README.md", "r") as fh:
 with open(os.path.join("requirements", "requirements.txt")) as reqs:
     REQUIREMENTS = reqs.readlines()
 
+with open(os.path.join("requirements", "requirements_test.txt")) as reqs:
+    REQUIREMENTS_TEST = reqs.readlines()
+
 setup(
     name='covey-sdk',
     version='0.0.5',
@@ -22,5 +25,6 @@ setup(
     url='https://github.com/covey-io/ethereum-contract-interaction',
     keywords='covey',
     install_requires=REQUIREMENTS,
+    tests_require=REQUIREMENTS_TEST,
 
 )
