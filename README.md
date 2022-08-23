@@ -10,11 +10,11 @@
 
     `python3 -m venv env` [^1]
     
-4. Activate the virtual environment.
+4. Activate the virtual environment[^2]. 
 
-    windows `source env/Scripts/Activate` [^2]
+    windows `source env/Scripts/Activate` 
 
-    mac `source env/bin/activate` [^2]
+    mac `source env/bin/activate`
  
 
 5. Once the environment is activated (the terminal should have the environment name pop up in front of the user name as **(env)**), proceed to install the covey-sdk.
@@ -33,7 +33,7 @@
     `import covey.covey_trade as ct`
 
     `t = ct.Trade(address = <public wallet key>, address_private = <private_wallet_key>, posting_only = True)`
-    
+
     `t.post_trades_polygon('FB:0.25')`
 
 [^1]: note you can call it env or venv just something conventional to remember, also important to use the command **python3** to make sure the proper version is installed in the virtual environment.
