@@ -21,12 +21,12 @@
     `pip install covey-sdk`
 
 6. If there are no errors, you are ready to open the project in Visual Studio Code.
-- Open VS Code and go to **File > Open Folder** *(choose the project)*.
-- Make sure the **env/** folder is visible in the project structure.
+    - Open VS Code and go to **File > Open Folder** *(choose the project)*.
+    - Make sure the **env/** folder is visible in the project structure.
 
 7.  Although it should be a default, make sure the proper interpreter is selected from the **env/** folder
-- Click `Ctrl + Shift + P` and type in **Python : Select Interpreter** in the drop down.
-- The proper interpreter will be in the **env/scripts** folder and will have a star next to it.
+    - Click `Ctrl + Shift + P` and type in **Python : Select Interpreter** in the drop down.
+    - The proper interpreter will be in the **env/scripts** folder and will have a star next to it.
 
 8. Create a new file called test.py or whichever name you would prefer and run the following code
 
