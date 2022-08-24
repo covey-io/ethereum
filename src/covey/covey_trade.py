@@ -11,9 +11,15 @@ from eth_account import account
 from datetime import datetime, timedelta
 from web3.middleware import geth_poa_middleware
 
-# covey libraries 
-from covey_price import Pricer
-from covey_calendar import CoveyCalendar
+# # covey libraries - internal test
+# from covey_sdk import get_data
+# from covey_pricer import Pricer
+# from covey_calendar import CoveyCalendar
+
+# covey libraries - packaging
+from covey import get_data, get_output
+from covey.covey_pricer import Pricer
+from covey.covey_calendar import CoveyCalendar
 
 class Trade:
     def __init__(self, **kwargs):
@@ -254,7 +260,7 @@ class Trade:
 
     # check for ticker changes, i.e. CREE -> WOLF on 10/1/2021
     def check_ticker_change(self,trading_key):
-        ticker_change_df = pd.read_csv('src/covey/data/ticker_changes.csv')
+        ticker_change_df = pd.read_csv(get_data('ticker_changes.csv'))
         df = pd.merge(left = trading_key, right = ticker_change_df, how = 'left', left_on = 'symbol', right_on='symbol')
         df['record_date'] = pd.to_datetime(df['record_date'])
         df['symbol'] = df.apply(lambda x : x['new_symbol'] if x['record_date'] <= x['entry_date_time'] else x['symbol'],
@@ -340,7 +346,7 @@ class Trade:
           
     # checking to see if there's any mergers - using a csv as record keeper for that at the moment
     def merger_check(self, trading_key):
-        merger_df = pd.read_csv('src/covey/data/mergers.csv')
+        merger_df = pd.read_csv(get_data('mergers.csv'))
         df = trading_key.copy()
         df = pd.merge(left=df, right=merger_df, how = 'left', left_on = 'symbol', right_on='symbol')
         df['is_merger'] = df.apply(lambda x  : 0 if pd.isnull(x['entry_price']) else 1, axis = 1)
@@ -367,9 +373,9 @@ class Trade:
     def export_to_csv(self, key : str = 'trading'):
         if len(self.trading_key.index) > 0:
             if key == 'trading':
-                self.trading_key.to_csv('src/covey/output/trading_key.csv', index=False)
+                self.trading_key.to_csv(get_output('trading_key.csv'), index=False)
             elif key == 'price':
-                self.price_key.to_csv('src/covey/output/price_key.csv', index=False)
+                self.price_key.to_csv(get_output('price_key.csv'), index=False)
 
 
 if __name__ == '__main__':
@@ -385,7 +391,7 @@ if __name__ == '__main__':
               posting_only=True)
 
     # post trades
-    t.post_trades_polygon('UUP:0.25')
+    #t.post_trades_polygon('UUP:0.25')
 
     # log how long it took
     print('---Trades for address {} finished in {} seconds ---'.format(t.address,time.time() - start_time))

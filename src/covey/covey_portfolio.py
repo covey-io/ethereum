@@ -4,12 +4,17 @@ import pandas as pd
 from dotenv import load_dotenv
 from dataclasses import make_dataclass
 from datetime import date, datetime,timedelta
+from covey import get_data, get_output, get_checks
 
-# covey libraries
-from covey_trade import Trade
-import covey_checks 
-from covey_calendar import CoveyCalendar
+# # covey libraries - internal test
+# from covey_trade import Trade
+# import covey_checks as covey_checks 
+# from covey_calendar import CoveyCalendar
 
+# covey libraries - packaging
+from covey.covey_trade import Trade
+import covey.covey_checks as covey_checks 
+from covey.covey_calendar import CoveyCalendar
 
 class Portfolio(Trade):
     def __init__(self, **kwargs):
@@ -124,7 +129,7 @@ class Portfolio(Trade):
         self.export_to_csv(key = 'position', df = df)
 
         # dividend logic 
-        dividends_df = pd.read_csv('src/covey/data/dividend_split.csv')
+        dividends_df = pd.read_csv(get_data('dividend_split.csv'))
         dividends_df['payment_date'] = pd.to_datetime(dividends_df['payment_date'])
         dividends_df = dividends_df[(dividends_df['div_or_split'] == 'dividend') & (dividends_df['payment_date'] == portfolio_date)][['symbol','amount']]
         
@@ -137,7 +142,7 @@ class Portfolio(Trade):
         df['dividend_cash'].fillna(0,inplace=True)
 
         # split logic
-        splits_df = pd.read_csv('src/covey/data/dividend_split.csv')
+        splits_df = pd.read_csv(get_data('dividend_split.csv'))
         splits_df['payment_date'] = pd.to_datetime(splits_df['payment_date'])
         splits_df = splits_df[(splits_df['div_or_split'] == 'split') & (splits_df['payment_date'] == portfolio_date)][['symbol', 'amount']]
         df = pd.merge(left=df, right=splits_df, on = 'symbol', how='left')
@@ -401,13 +406,13 @@ class Portfolio(Trade):
         # derived column : total pnl = unrealized pnl + realized pnl or total long pnl + total short pnl
         self.portfolio.iloc[1:,23] = self.portfolio.iloc[1:,21] + self.portfolio.iloc[1:,22]
 
-        # export portfolio output to csv format in output/portfolio.csv
+        # export portfolio output to csv format
         self.export_to_csv('portfolio')
 
-        # export trading key output to csv format in output/trading_key.csv
+        # export trading key output to csv format
         self.export_to_csv('trading')
 
-        # export price key output to csv format in output/trading_key.csv
+        # export price key output to csv format
         self.export_to_csv('price')
 
         return 0
@@ -415,15 +420,15 @@ class Portfolio(Trade):
     # export to csv
     def export_to_csv(self, key: str = 'trading', df : pd.DataFrame = None):
         if key == 'trading':
-            self.trading_key.to_csv('src/covey/output/trading_key.csv', index=False)
+            self.trading_key.to_csv(get_output('trading_key.csv'), index=False)
         elif key == 'price':
-            self.price_key.to_csv('src/covey/output/price_key.csv')
+            self.price_key.to_csv(get_output('price_key.csv'))
         elif key == 'portfolio':
-            self.portfolio.to_csv('src/covey/output/portfolio.csv')
+            self.portfolio.to_csv(get_output('portfolio.csv'))
         elif key == 'crypto_check':
-            self.unpriced_crypto.to_csv('src/covey/checks/unpriced_crypto_test_{}.csv'.format(self.address))
+            self.unpriced_crypto.to_csv(get_checks('unpriced_crypto_test_{}.csv'.format(self.address)))
         elif key == "position":
-            df.to_csv('src/covey/output/latest_positions.csv', index=False)
+            df.to_csv(get_output('latest_positions.csv'), index=False)
 
 
 if __name__ == '__main__':

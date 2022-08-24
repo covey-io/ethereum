@@ -1,37 +1,29 @@
-import sys
+import os
 import time
 import asyncio
 import pandas as pd
 import nest_asyncio
-from enum import Enum
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from alpaca_trade_api.rest import TimeFrame
-from alpaca_trade_api.rest_async import gather_with_concurrency, AsyncRest
+from alpaca.data.timeframe import TimeFrame
+from alpaca.data.requests import CryptoBarsRequest, StockBarsRequest
+from alpaca.data import CryptoHistoricalDataClient, StockHistoricalDataClient
 
 
-
-NY = 'America/New_York'
-
-class DataType(str, Enum):
-    Bars = "Bars"
-    Trades = "Trades"
-    Quotes = "Quotes"
-
+# Pricer class using the new alpaca-SDK (alpaca-py) package
 class Pricer:
     def __init__(self, **kwargs):
         # in case running with nested async CLIs (i.e. Jupyter Notebook, Pycharm IDE (cough))
         nest_asyncio.apply()
 
-        # initialize the 'df' variable, the data frame with final output depending on what we ask (prices, quotes)
-        self.df = pd.DataFrame(columns=['symbol','timestamp','vwap'])
-
         # load environment variables (aplaca private and public keys)
         load_dotenv()
 
-        # initiate the async_rest class, which will initialize the keys, no params is fine it will find the keys
-        # if they are in the environment (hence we did the load_dotenv())
-        self.rest = AsyncRest()
+        # initialize the 'df' variable, the data frame with final output depending on what we ask (prices, quotes)
+        self.prices = pd.DataFrame(columns=['symbol','timestamp','vwap', 'open', 'high', 'low', 'close', 'volume', 'trade_count'])
+
+        # set the index to be symbol & timestamp - this is the native format for new alpaca
+        self.prices.set_index(['symbol','timestamp'], inplace=True)
 
         # set the start date (if not provided)
         self.start = kwargs.get('start',pd.Timestamp('2022-01-01', tz=None).date().isoformat())
@@ -52,111 +44,93 @@ class Pricer:
         # hard us equity exclusions - no exclusions by default
         self.us_equity_exclusions = kwargs.get('us_equity_exclusions', [])
 
-        # US Equity Tickers
+        # us equity Tickers - set upon initialization
         self.us_equity_symbols = self.get_us_equity_symbols()
 
-        # Crypto Tickers
+        # crypto Tickers - set upon initialization
         self.crypto_symbols = self.get_crypto_symbols()
+
+        # gather the trades
+        asyncio.run(self.gather_prices())
 
         # generate price key
         self.price_key = self.get_price_key()
 
-
+    # extracting us equity symbols from symbols list
     def get_us_equity_symbols(self):
+        # remove tickers ending in USDT - which is how web3 delivers crypto tickers
         return [e for e in self.symbols if not e.endswith('USDT') and e not in self.us_equity_exclusions]
 
-
+    # extracting crypto symbols from symbols list
     def get_crypto_symbols(self):
-        return [c.replace('USDT', 'USD') for c in self.symbols if c.endswith('USDT')
+        # replace USDT with /USD - in new alpaca SDK
+        return [c.replace('USDT', '/USD') for c in self.symbols if c.endswith('USDT')
                 and c not in self.crypto_exclusions]
 
+    # pulling equity prices
+    async def get_prices_equity(self):
+        # make sure we have equity symbols
+        if len(self.us_equity_symbols) > 0:
+            # initialize the client - need to authenticate for equities
+            client = StockHistoricalDataClient(os.environ.get('APCA_API_KEY_ID'),  
+                                                os.environ.get('APCA_API_SECRET_KEY'))
+            
+            # set the request parameters (i.e. start, frequency, symbols)
+            request_params = StockBarsRequest(
+                            symbol_or_symbols=self.us_equity_symbols,
+                            timeframe=self.timeframe,
+                            start=self.start
+                    )
 
-    def get_data_method(self,data_type: DataType):
-        if data_type == DataType.Bars:
-            return self.rest.get_bars_async
-        elif data_type == DataType.Trades:
-            return self.rest.get_trades_async
-        elif data_type == DataType.Quotes:
-            return self.rest.get_quotes_async
-        else:
-            raise Exception(f"Unsupoported data type: {data_type}")
+            # capture the bars list
+            bars = client.get_stock_bars(request_params)
 
+            # convert the bars list 
+            bars_df = bars.df
 
-    async def get_historic_data_base(self,symbols, data_type: DataType, start, end,
-                                     timeframe: TimeFrame = None, asset_type : str = 'stock'):
-        """
-        base function to use with all
-        :param symbols:
-        :param start:
-        :param end:
-        :param timeframe:
-        :return:
-        """
-        major = sys.version_info.major
-        minor = sys.version_info.minor
-        if major < 3 or minor < 6:
-            raise Exception('asyncio is not support in your python version')
-        msg = f"Getting {data_type} data for {len(symbols)} symbols"
-        msg += f", timeframe: {timeframe}" if timeframe else ""
-        msg += f" between dates: start={start}, end={end}"
-        print(msg)
-        step_size = 1000
-        results = []
-        for i in range(0, len(symbols), step_size):
-            tasks = []
-            for symbol in symbols[i:i+step_size]:
-                args = [symbol, start, end, timeframe.value, asset_type] if timeframe else \
-                    [symbol, start, end,asset_type]
-                tasks.append(self.get_data_method(data_type)(*args))
+            # append to the initial price df - we only need vwap 
+            self.prices = pd.concat([self.prices, bars_df])
+        
+        return 0
 
-            if minor >= 8:
-                results.extend(await asyncio.gather(*tasks, return_exceptions=True))
-            else:
-                results.extend(await gather_with_concurrency(500, *tasks))
+    # pulling crypto prices (no need to authenticate with public/private keys here)
+    async def get_prices_crypto(self):
+        # make sure we have crypt symbols
+        if len(self.crypto_symbols) > 0:
+            # initialize the client
+            client = CryptoHistoricalDataClient()
+            
+            # set the request parameters (i.e. start, frequency, symbols)
+            request_params = CryptoBarsRequest(
+                            symbol_or_symbols=self.crypto_symbols,
+                            timeframe=self.timeframe,
+                            start=self.start
+                    )
 
-        bad_requests = 0
-        for response in results:
-            if isinstance(response, Exception):
-                print(f"Got an error: {response}")
+            # capture the bars list
+            bars = client.get_crypto_bars(request_params)
 
-            elif not len(response[1]):
-                bad_requests += 1
+            # convert the bars list 
+            bars_df = bars.df
 
-            # append to main price data frame
-            if len(response[1].index) == 0:
-                response_df = pd.DataFrame(columns=['symbol','timestamp','vwap'])
-            else:
-                response_df = response[1].reset_index()
-                response_df['symbol'] = response[0]
+            # append to the initial price df
+            self.prices = pd.concat([self.prices, bars_df])
 
-            self.df = pd.concat([self.df,response_df[['symbol','timestamp','vwap']]])
+        return 0
 
-        #print(results)
-        #print(f"Total of {len(results)} {data_type}, and {bad_requests} "
-               #f"empty responses.")
+    # gather prices into one dataframe
+    async def gather_prices(self):
+        await asyncio.gather(self.get_prices_equity(), self.get_prices_crypto())
 
-
-    async def get_historic_bars(self,symbols, start, end, timeframe: TimeFrame, asset_type : str = 'stock'):
-        await self.get_historic_data_base(symbols, DataType.Bars, start, end, timeframe, asset_type)
-
-
-    async def fill_price_data(self):
-        await self.get_historic_bars(self.us_equity_symbols, self.start, self.end, self.timeframe)
-        await self.get_historic_bars(self.crypto_symbols, self.start, self.end, self.timeframe,'crypto')
-
-
+    # generate the final clean price key to be used by trade and portfolio files
     def get_price_key(self):
-        # start the timer
-        start_time = time.time()
-
-        # fill the dataframe of prices
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.fill_price_data())
-
         # make a copy of original df
-        price_key = self.df.copy()
+        price_key = self.prices.copy()
 
-        # conversion for future date operations
+        # reset the index because we'll need to work with the data and ticker columns
+        price_key.reset_index(inplace=True)
+
+         # conversion for future date operations
         price_key['timestamp'] = pd.to_datetime(price_key['timestamp'])
 
         # remove time zone awareness
@@ -207,22 +181,32 @@ class Pricer:
         price_key_full['vwap'].fillna(0, inplace=True)
 
         # put back the USDT instead of the USD so it doesn't cause problems later in posting the trades
-        price_key_full['symbol'] = price_key_full.apply(lambda x : x['symbol'].replace('USD', 'USDT') if x['symbol'].endswith('USD') 
+        price_key_full['symbol'] = price_key_full.apply(lambda x : x['symbol'].replace('/USD', 'USDT') if x['symbol'].endswith('/USD') 
                                                                 and x['symbol'] in self.crypto_symbols else x['symbol'], axis=1)
 
-        print('Price Key finished in {} seconds'.format(time.time() - start_time))
-
-        return price_key_full
+   
+        # desired columns 
+        output_columns = ['timestamp','symbol','vwap','delayed_trade_date']
+        
+        return price_key_full[output_columns]
 
 
 
 if __name__ == '__main__':
+    # start the timer
     start_time = time.time()
 
     # initialize 'the pricer' (naming done by VS it may not be his best work, open to changing!)
-    # the class has default variables for required start,end,tickers,timeframe so we don't need to pass anything to test
-    p = Pricer(symbols = ['ETHUSDT'])
+    # the class has default variables for required start,end,tickers,timeframe 
+    # so we don't need to pass anything to test
+    p = Pricer(symbols = ['META'])
 
+    # print the price key
     print(p.price_key)
 
+    # print how long it took
     print(f"took {time.time() - start_time} sec")
+
+
+
+

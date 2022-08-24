@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-src/covey-sdk/__pycache__/
+src/covey/__pycache__/
 
 # Distribution / packaging
 env/

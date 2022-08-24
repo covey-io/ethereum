@@ -12,14 +12,14 @@ with open(os.path.join("requirements", "requirements_test.txt")) as reqs:
 
 setup(
     name='covey-sdk',
-    version='0.0.5',
+    version='0.0.6',
     description='Covey Trading Tools',
     long_description= README,
     long_description_content_type='text/markdown',
     license='MIT',
     author="Vadim Serebrinskiy",
     author_email="vs@covey.io",
-    packages=find_packages('src'),
+    packages=find_packages(where='src'),
     package_dir={'': 'src'},
     include_package_data = True,
     url='https://github.com/covey-io/ethereum-contract-interaction',

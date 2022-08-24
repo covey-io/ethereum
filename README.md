@@ -41,7 +41,7 @@
 [^2]: again note that 'env' is just a name we used to name our virtual environment. You can call it covey_env or something custom if you wish.
 
 
-9. Note the post trades string needs to be one string with the format '<ticker>:<allocation>,<ticker>:<allocation>,...'
+9. Note the post trades string needs to be one string with the format *<ticker>:<target_allocation>,<ticker>:<target_allocation>,...*
 
 If successful, the terminal should write back that your trades have been posted.
 
