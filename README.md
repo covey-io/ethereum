@@ -29,7 +29,7 @@
 
     `t.post_trades_polygon('FB:0.25,ETHUSDT:0.15,AMZN:0.0')`
 
-7. Note the post trades string needs to be one string with the format '<ticker>:<target_percent>,<ticker>:<target_percent>,...'
+7. Note the post trades string needs to be one string with the format *<ticker>:<target_percent>,<ticker>:<target_percent>,...*
 
 If successful, the terminal should write back that your trades have been posted.
 
