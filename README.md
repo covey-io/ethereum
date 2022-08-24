@@ -35,7 +35,7 @@ If successful, the terminal should write back that your trades have been posted.
 
 Please let us know if you have any questions or run into issues, happy coding!
 
-#FAQs
+# FAQs
 *** 
 * target_percent is the new percent you want the size to be. If you had a prior target_percent of 0.01 (1%), then you added a new target_percent of 0.03 (3%) that would buy you an additional (0.02) 2%. So the end position is 0.03 (3%)
 * To close a position you need to run target_percent = 0.0
