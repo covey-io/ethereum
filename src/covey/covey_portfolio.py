@@ -4,14 +4,15 @@ import pandas as pd
 from dotenv import load_dotenv
 from dataclasses import make_dataclass
 from datetime import date, datetime,timedelta
-from covey import get_data, get_output, get_checks
 
 # # covey libraries - internal test
+# from utils import get_data, get_output, get_checks
 # from covey_trade import Trade
 # import covey_checks as covey_checks 
 # from covey_calendar import CoveyCalendar
 
 # covey libraries - packaging
+from covey import get_data, get_output, get_checks
 from covey.covey_trade import Trade
 import covey.covey_checks as covey_checks 
 from covey.covey_calendar import CoveyCalendar
@@ -115,15 +116,24 @@ class Portfolio(Trade):
         return 0
 
     def get_active_positions(self, portfolio_date):
+
+        columns = ['address','symbol', 'target_percentage','post_cumulative_share_count', 'vwap', 
+        'current_position', 'long_post_cumulative_share_count','short_post_cumulative_share_count',
+        'realized_profit', 'dividend_cash', 'dividend_cash_long','dividend_cash_short']
+
         df = self.trading_key.copy()
+        
         df = df[(df['market_entry_date_time'] < portfolio_date) ]
         df['symbol_date_rank'] = df.groupby('symbol')['entry_date_time'].rank('dense', ascending=False)
-        
+
         # realized profit sum partitioned by symbol
         df['realized_profit_symbol_agg'] = df.groupby('symbol')['realized_profit'].transform(sum)
         df['realized_profit_final'] = df['realized_profit_symbol_agg'] - df['realized_profit']
         df = df[(df['symbol_date_rank'] == 1) & (df['post_cumulative_share_count'] != 0)]
         df['current_position'].fillna(0, inplace=True)
+
+        if len(df.index) < 1:
+            return pd.DataFrame(columns=columns)
 
         # export to csv
         self.export_to_csv(key = 'position', df = df)
@@ -132,12 +142,12 @@ class Portfolio(Trade):
         dividends_df = pd.read_csv(get_data('dividend_split.csv'))
         dividends_df['payment_date'] = pd.to_datetime(dividends_df['payment_date'])
         dividends_df = dividends_df[(dividends_df['div_or_split'] == 'dividend') & (dividends_df['payment_date'] == portfolio_date)][['symbol','amount']]
-        
+
         # merge to main df (trading key) and calculate dividends
         df = pd.merge(left=df, right=dividends_df, on = 'symbol', how='left')
         df.rename(columns={'amount':'div_amount'}, inplace=True)
         df['dividend_cash'] = df['div_amount'] * df['post_cumulative_share_count']
-        
+
         # if we don't have dividends, sad but have to fill with 0
         df['dividend_cash'].fillna(0,inplace=True)
 
@@ -147,7 +157,7 @@ class Portfolio(Trade):
         splits_df = splits_df[(splits_df['div_or_split'] == 'split') & (splits_df['payment_date'] == portfolio_date)][['symbol', 'amount']]
         df = pd.merge(left=df, right=splits_df, on = 'symbol', how='left')
         df.rename(columns={'amount':'split_amount'}, inplace=True)
-        
+
         # fill NA split amounts as 1 so it won't nullify the new vwap price post multiplication
         df['split_amount'] .fillna(1, inplace=True)
         df['adjusted_entry'] = df['vwap']
@@ -167,10 +177,8 @@ class Portfolio(Trade):
 
         # # export to csv
         # self.export_to_csv(key = 'position', df = df)
-        
-        return df[['address','symbol', 'target_percentage','post_cumulative_share_count', 'vwap', 
-                    'current_position', 'long_post_cumulative_share_count','short_post_cumulative_share_count',
-                        'realized_profit', 'dividend_cash', 'dividend_cash_long','dividend_cash_short']]
+
+        return df[columns]
     
     def get_previous_positions(self, symbol, latest_index):
         # previous positions mask
@@ -361,6 +369,13 @@ class Portfolio(Trade):
         self.portfolio.iloc[current_loc,24] = (self.portfolio.iloc[current_loc,1] / prior_portfolio_usd) * prior_portfolio_inception_return
     
     def calculate_portfolio(self):
+        # if its effectively no trading history (DUMMY ticker only)
+        if self.trading_key.symbol.unique()[0] == 'DUMMY' and len(self.trading_key.index) == 1:
+            self.portfolio.ffill(inplace=True)
+
+            # exit the function
+            return 0
+
         # get the main portfolio calculations
         self.portfolio.iloc[1:,:].groupby(self.portfolio.index[1:]).apply(self.evaluate_portfolio_row)
 
@@ -439,8 +454,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     # initialize an example portfolio
-    p = Portfolio(address=os.environ.get('WALLET_PUBLIC'),
-                address_private = os.environ.get('WALLET_PRIVATE'))
+    p = Portfolio(address='0x31141854e4C5B732127507654a9D1E83b7b082d2')
 
     # calculate the portfolio from inception
     p.calculate_portfolio()

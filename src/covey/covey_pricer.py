@@ -85,11 +85,14 @@ class Pricer:
             # capture the bars list
             bars = client.get_stock_bars(request_params)
 
-            # convert the bars list 
-            bars_df = bars.df
+            # perform dataframe operatios only if we have any bars
+            if len(bars.data) > 0:
 
-            # append to the initial price df - we only need vwap 
-            self.prices = pd.concat([self.prices, bars_df])
+                # convert the bars list 
+                bars_df = bars.df
+
+                # append to the initial price df - we only need vwap 
+                self.prices = pd.concat([self.prices, bars_df])
         
         return 0
 
@@ -110,11 +113,14 @@ class Pricer:
             # capture the bars list
             bars = client.get_crypto_bars(request_params)
 
-            # convert the bars list 
-            bars_df = bars.df
+             # perform dataframe operatios only if we have any bars
+            if len(bars.data) > 0:
 
-            # append to the initial price df
-            self.prices = pd.concat([self.prices, bars_df])
+                # convert the bars list 
+                bars_df = bars.df
+
+                # append to the initial price df - we only need vwap 
+                self.prices = pd.concat([self.prices, bars_df])
 
         return 0
 
