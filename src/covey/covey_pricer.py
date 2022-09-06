@@ -2,7 +2,6 @@ import os
 import time
 import asyncio
 import pandas as pd
-import nest_asyncio
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from alpaca.data.timeframe import TimeFrame
@@ -13,9 +12,6 @@ from alpaca.data import CryptoHistoricalDataClient, StockHistoricalDataClient
 # Pricer class using the new alpaca-SDK (alpaca-py) package
 class Pricer:
     def __init__(self, **kwargs):
-        # in case running with nested async CLIs (i.e. Jupyter Notebook, Pycharm IDE (cough))
-        nest_asyncio.apply()
-
         # load environment variables (aplaca private and public keys)
         load_dotenv()
 
@@ -205,7 +201,7 @@ if __name__ == '__main__':
     # initialize 'the pricer' (naming done by VS it may not be his best work, open to changing!)
     # the class has default variables for required start,end,tickers,timeframe 
     # so we don't need to pass anything to test
-    p = Pricer(symbols = ['META'])
+    p = Pricer(symbols = ['META','ETHUSDT'])
 
     # print the price key
     print(p.price_key)

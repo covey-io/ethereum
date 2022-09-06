@@ -4,7 +4,6 @@ import time
 import asyncio
 import eth_keys
 import pandas as pd
-import nest_asyncio
 from web3 import Web3
 from dotenv import load_dotenv
 from eth_account import account
@@ -25,9 +24,6 @@ class Trade:
     def __init__(self, **kwargs):
         # check if posting only - False by default
         self.posting_only = kwargs.get('posting_only',False)
-
-        # in case running with nested async CLIs (i.e. Jupyter Notebook, Pycharm IDE (cough))
-        nest_asyncio.apply()
 
         # Geth web3 for account stuff
         self.gethWeb3 = Web3(Web3.IPCProvider())

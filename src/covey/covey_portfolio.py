@@ -454,7 +454,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     # initialize an example portfolio
-    p = Portfolio(address='0x31141854e4C5B732127507654a9D1E83b7b082d2')
+    p = Portfolio(address='0xbca420ef5bf514a13e099c83826d2fc86af071fa')
 
     # calculate the portfolio from inception
     p.calculate_portfolio()
