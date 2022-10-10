@@ -3,6 +3,7 @@ import time
 import asyncio
 import pandas as pd
 from dotenv import load_dotenv
+from covey import get_data, get_output, get_segments
 from datetime import datetime, timedelta
 from alpaca.data.timeframe import TimeFrame
 from alpaca.data.requests import CryptoBarsRequest, StockBarsRequest
@@ -68,6 +69,10 @@ class Pricer:
         # make sure we have equity symbols
         if len(self.us_equity_symbols) > 0:
             # initialize the client - need to authenticate for equities
+
+            # not so fast check for ticker changes
+            self.us_equity_symbols = self.check_ticker_change(self.us_equity_symbols)
+
             client = StockHistoricalDataClient(os.environ.get('APCA_API_KEY_ID'),  
                                                 os.environ.get('APCA_API_SECRET_KEY'))
             
@@ -87,10 +92,58 @@ class Pricer:
                 # convert the bars list 
                 bars_df = bars.df
 
+                bars_df['vwap'] = bars_df.groupby('symbol')['vwap'].shift()
+
                 # append to the initial price df - we only need vwap 
                 self.prices = pd.concat([self.prices, bars_df])
         
         return 0
+
+
+    async def get_single_equity_prices(self, symbol, client, start, end):
+        # set the request parameters (i.e. start, frequency, symbols)
+        
+        request_params = StockBarsRequest(
+                        symbol_or_symbols=symbol,
+                        timeframe=self.timeframe,
+                        start=start,
+                        end = end
+                )
+        try:
+            # capture the bars list
+            bars = client.get_stock_bars(request_params)
+
+            # append to the initial price df - we only need vwap 
+            self.prices = pd.concat([self.prices, bars.df])
+        except AttributeError:
+            print("Could not find prices for {} between {} and {}".format(symbol,start,end))
+        
+
+
+    async def get_equity_historic_database(self):
+        # make sure we have equity symbols
+        if len(self.us_equity_symbols) > 0:
+            # initialize the client - need to authenticate for equities
+
+            # not so fast check for ticker changes
+            self.us_equity_symbols = self.check_ticker_change(self.us_equity_symbols)
+
+            client = StockHistoricalDataClient(os.environ.get('APCA_API_KEY_ID'),  
+                                                os.environ.get('APCA_API_SECRET_KEY'))
+
+            # break up the dates into segments 
+            segments = get_segments(self.start, self.end)
+
+
+            # loop through the symbols and create a task group/coroutine
+            for symbol in self.us_equity_symbols:
+                for segment in segments:
+                    await asyncio.gather(self.get_single_equity_prices(symbol, client, 
+                                    pd.Timestamp(segment[0], tz=None).date().isoformat(), 
+                                    pd.Timestamp(segment[1], tz=None).date().isoformat())
+                    )
+
+   
 
     # pulling crypto prices (no need to authenticate with public/private keys here)
     async def get_prices_crypto(self):
@@ -186,11 +239,42 @@ class Pricer:
         price_key_full['symbol'] = price_key_full.apply(lambda x : x['symbol'].replace('/USD', 'USDT') if x['symbol'].endswith('/USD') 
                                                                 and x['symbol'] in self.crypto_symbols else x['symbol'], axis=1)
 
+
+        # check for ticker changes - grab the old symbol 
+        #price_key_full = self.check_ticker_change(price_key_full)
+
+        # map back to initial ticker if there was a ticker change (i.e. map PARA back to VIAC before 2/16/2022)
+        ticker_change_df = pd.read_csv(get_data('ticker_changes.csv'))
+        ticker_change_df['record_date'] = pd.to_datetime(ticker_change_df['record_date'])
+        price_key_full = pd.merge(left = price_key_full, right=ticker_change_df, left_on = 'symbol', right_on='new_symbol', how = 'left')
+
+        price_key_full['symbol'] = price_key_full.apply(lambda x : x['symbol_y'] if not(pd.isna(x['symbol_y']))
+                                                                 and x['timestamp'] < x['record_date'] else x['symbol_x'],axis=1)
    
         # desired columns 
         output_columns = ['timestamp','symbol','vwap','delayed_trade_date']
         
         return price_key_full[output_columns]
+
+# check for ticker changes, i.e. CREE -> WOLF on 10/1/2021
+    def check_ticker_change(self,equity_symbols):
+        ticker_change_df = pd.read_csv(get_data('ticker_changes.csv'))
+
+        # grab the latest ticker change per original ticker, just in case
+        ticker_change_df = ticker_change_df.sort_values('record_date').groupby('symbol').tail(1)
+
+        # merge the equity symbols with the ticker change df -  see what remains
+        df = pd.merge(left = pd.DataFrame(equity_symbols, columns=['symbol']), right = ticker_change_df, how = 'inner', on  = 'symbol')
+       
+        # all that remains are the old tickers and the new tickers, drop the old symbols from the equity symbols list
+        [equity_symbols.remove(l) for l in df['symbol'].to_list()]
+
+        # append the new symbols to equity symbols 
+        equity_symbols.extend(df['new_symbol'].to_list())
+
+        print(equity_symbols)
+
+        return equity_symbols
 
 
 
@@ -201,9 +285,11 @@ if __name__ == '__main__':
     # initialize 'the pricer' (naming done by VS it may not be his best work, open to changing!)
     # the class has default variables for required start,end,tickers,timeframe 
     # so we don't need to pass anything to test
-    p = Pricer(symbols = ['META','ETHUSDT'])
 
-    # print the price key
+    symbols = ['VIAC']
+
+    p = Pricer(symbols=symbols , start = '2022-01-01', end = '2022-09-15')
+
     print(p.price_key)
 
     # print how long it took

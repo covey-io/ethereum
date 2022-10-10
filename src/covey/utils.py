@@ -10,3 +10,4 @@ def get_output(path):
 
 def get_checks(path):
     return os.path.join(_ROOT, 'checks', path)
+
