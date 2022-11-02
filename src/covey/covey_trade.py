@@ -235,8 +235,8 @@ class Trade:
             # check for ticker changes
             self.trades = self.check_ticker_change(self.trades)
 
-            # convert usdt to usd for filtering purposes
-            self.trades['symbol'] = self.trades['symbol'].str.replace('USDT','USD')
+            # convert usdt (ending) to usd for filtering purposes
+            self.trades['symbol'] = self.trades['symbol'].str.replace('USDT$','USD',regex=True)
 
             # symbols before filter
             pre_filter_symbols = self.get_symbols()
@@ -248,7 +248,7 @@ class Trade:
             post_filter_symbols = self.get_symbols()
 
             # convert usd back to usdt for pricing purposes
-            self.trades['symbol'] = self.trades['symbol'].str.replace('USD','USDT')
+            self.trades['symbol'] = self.trades['symbol'].str.replace('USD$','USDT',regex=True)
 
             # symbols filtered out
             print(f"{list(set(pre_filter_symbols) - set(post_filter_symbols))} were filtered out.")
