@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from eth_account import account
 from datetime import datetime, timedelta
 from web3.middleware import geth_poa_middleware
+from alpaca.trading import TradingClient
 
 # # covey libraries - internal test
 # from utils import get_data, get_output, get_checks
@@ -59,6 +60,7 @@ class Trade:
             self.transform_trades()
             
             # generate price key
+            print("Getting price key in the covey trade")
             p = Pricer(start= self.get_min_trade_entry(), symbols=self.get_symbols())
             self.price_key = p.price_key
 
@@ -172,6 +174,24 @@ class Trade:
             return s.lstrip("-").replace('.', '', 1).isdigit()
         except AttributeError:
             return False
+    
+    # grab the alpaca universe - this will be used in the transform trade function
+    def get_alpaca_universe(self):
+        # initialized trading client
+        b = TradingClient(api_key = os.environ.get('APCA_API_KEY_ID'), secret_key = os.environ.get('APCA_API_SECRET_KEY'))
+        # get the 'list' of assets
+        asset_list = b.get_all_assets()
+        # put the instance dict() into a dataframe
+        asset_df = pd.DataFrame([a.dict() for a in asset_list])
+        # cleanup
+        asset_df['asset_class'] = asset_df['asset_class'].str.replace('AssetClass.','',regex=True)
+        asset_df['status'] = asset_df['status'].str.replace('AssetStatus.','',regex=True)
+        asset_df['exchange'] = asset_df['exchange'].str.replace('AssetExchange.','', regex=True)
+        asset_df['symbol'] = asset_df['symbol'].str.replace('/','', regex=True)
+        # filter for tradeable and active assets only
+        asset_mask = (asset_df['tradable'] == True) & (asset_df['status'] == 'active')
+        # return filtered df
+        return asset_df[asset_mask]
 
     # transformations to the trades data frame including the actual splitting out of the trades lists
     def transform_trades(self):
@@ -189,6 +209,9 @@ class Trade:
                                                                  0:2]
             except ValueError:
                 self.trades[['symbol', 'target_percentage']] = ['BLANK', 0]
+            
+            # trim the symbol names just in case
+            self.trades['symbol'] = self.trades['symbol'].str.strip()
 
             # clean up the covey-reset, the target_percentage should be numeric
             self.trades['target_percentage'] = self.trades['target_percentage'].apply(
@@ -209,7 +232,29 @@ class Trade:
             # set the trade ID - will be in ascending order of entry date time thanks to above line
             self.trades['trade_id'] = [x for x in range(1, len(self.trades.values) + 1)]
 
+            # check for ticker changes
             self.trades = self.check_ticker_change(self.trades)
+
+            # convert usdt to usd for filtering purposes
+            self.trades['symbol'] = self.trades['symbol'].str.replace('USDT','USD')
+
+            # symbols before filter
+            pre_filter_symbols = self.get_symbols()
+
+            # filter on universe - don't want any rogue tickers that will adversely affect the pricer file
+            self.trades = pd.merge(left=self.trades, right=self.get_alpaca_universe()[['symbol']], how='inner', on='symbol')
+
+            # symbols after filter
+            post_filter_symbols = self.get_symbols()
+
+            # convert usd back to usdt for pricing purposes
+            self.trades['symbol'] = self.trades['symbol'].str.replace('USD','USDT')
+
+            # symbols filtered out
+            print(f"{list(set(pre_filter_symbols) - set(post_filter_symbols))} were filtered out.")
+
+            # print all symbols we've encountered
+            #print(f"{list(pre_filter_symbols) + list(post_filter_symbols)} were seen here.")            
 
         else:
             print("The trades dataframe has not been filled yet")
