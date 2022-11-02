@@ -254,7 +254,7 @@ class Trade:
             print(f"{list(set(pre_filter_symbols) - set(post_filter_symbols))} were filtered out.")
 
             # print all symbols we've encountered
-            #print(f"{list(pre_filter_symbols) + list(post_filter_symbols)} were seen here.")            
+            #print(f"{list(pre_filter_symbols) + list(post_filter_symbols)} were seen here.")         
 
         else:
             print("The trades dataframe has not been filled yet")
@@ -378,6 +378,16 @@ class Trade:
 
             df_post_merge_check = self.merger_check(df[columns_to_return])
 
+            # drop trade id
+            df_post_merge_check.drop(columns = ['trade_id'], inplace=True)
+
+            # sort the trades and set the index
+            df_post_merge_check.sort_values(by='entry_date_time', ascending=True, inplace=True)
+
+            # set the trade ID - will be in ascending order of entry date time thanks to above line
+            df_post_merge_check['trade_id'] = [x for x in range(1, len(self.trades.values) + 1)]
+
+            # set index to trade id
             df_post_merge_check.set_index('trade_id',inplace=True)
 
             return df_post_merge_check
