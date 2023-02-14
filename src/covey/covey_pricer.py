@@ -3,11 +3,16 @@ import time
 import asyncio
 import pandas as pd
 from dotenv import load_dotenv
-from covey import get_data, get_output, get_segments
 from datetime import datetime, timedelta
 from alpaca.data.timeframe import TimeFrame
 from alpaca.data.requests import CryptoBarsRequest, StockBarsRequest
 from alpaca.data import CryptoHistoricalDataClient, StockHistoricalDataClient
+
+# for packaging
+from covey import get_data, get_segments
+
+# # for internal testing
+# from utils import get_data, get_checks
 
 
 # Pricer class using the new alpaca-SDK (alpaca-py) package

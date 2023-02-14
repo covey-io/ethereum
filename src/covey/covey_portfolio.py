@@ -369,8 +369,14 @@ class Portfolio(Trade):
         self.portfolio.iloc[current_loc,24] = (self.portfolio.iloc[current_loc,1] / prior_portfolio_usd) * prior_portfolio_inception_return
     
     def calculate_portfolio(self):
+        if len(self.trading_key.index)==0:
+            self.portfolio.ffill(inplace=True)
+
+            # exit the function
+            return 0
+
         # if its effectively no trading history (DUMMY ticker only)
-        if self.trading_key.symbol.unique()[0] == 'DUMMY' and len(self.trading_key.index) == 1:
+        if (self.trading_key.symbol.unique()[0] == 'DUMMY' and len(self.trading_key.index) == 1):
             self.portfolio.ffill(inplace=True)
 
             # exit the function
@@ -454,10 +460,19 @@ if __name__ == '__main__':
     start_time = time.time()
 
     # initialize an example portfolio
-    p = Portfolio(address='0xbca420ef5bf514a13e099c83826d2fc86af071fa')
+    p = Portfolio(address='0xB7059aEa8DE57329556a11Ed72dC1A392c0DF351')
 
     # calculate the portfolio from inception
     p.calculate_portfolio()
 
+    # grab current timestamp - this will be used to get 'active positions' in the portfolio
+    current_time_stamp = datetime.now() + timedelta(days=1)
+
+    # get rid of minute,second, and microsecond (lol)
+    current_time_stamp_clean = current_time_stamp.replace(minute=0,second=0,microsecond=0)
+
+    # blockchain positions
+    blockchain_positions = p.get_active_positions(current_time_stamp_clean)
+    
     # print statement announcing finish and run time taken
     print("---Portfolio finished in %s seconds ---" % (time.time() - start_time))

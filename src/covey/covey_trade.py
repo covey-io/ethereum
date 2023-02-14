@@ -123,8 +123,8 @@ class Trade:
         w3.middleware_onion.inject(geth_poa_middleware, layer=0)
         covey_ledger = w3.eth.contract(address=self.covey_ledger_polygon_address, abi=self.abi)
         my_address = w3.toChecksumAddress(self.address)
-        nonce = w3.eth.get_transaction_count(my_address)
-        gas = covey_ledger.functions.createContent(positionString).estimate_gas({'from': my_address, 'nonce': nonce})
+        nonce = w3.eth.get_transaction_count(my_address,'pending')
+        gas = covey_ledger.functions.createContent(positionString).estimate_gas({'from': my_address, 'nonce': nonce}) 
         txn = covey_ledger.functions.createContent(positionString).build_transaction({
             'chainId': int(self.polygon_chain_id),
             'gas': gas,
@@ -394,6 +394,8 @@ class Trade:
 
         else:
             print("The trades data frame has not been filled yet")
+            # return empty dataframe
+            return pd.DataFrame(columns=columns_to_return, index=[0])
           
     # checking to see if there's any mergers - using a csv as record keeper for that at the moment
     def merger_check(self, trading_key):

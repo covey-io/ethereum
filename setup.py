@@ -12,7 +12,7 @@ with open(os.path.join("requirements", "requirements_test.txt")) as reqs:
 
 setup(
     name='covey-sdk',
-    version='0.1.5',
+    version='0.1.6',
     description='Covey Trading Tools',
     long_description= README,
     long_description_content_type='text/markdown',
