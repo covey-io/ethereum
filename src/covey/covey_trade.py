@@ -4,6 +4,7 @@ import time
 import asyncio
 import eth_keys
 import pandas as pd
+import requests
 from web3 import Web3
 from dotenv import load_dotenv
 from eth_account import account
@@ -46,6 +47,9 @@ class Trade:
 
         # set the abi - must pass in the covey ledger file here otherwise will not work
         self.abi = json.load(open(os.path.join(os.path.dirname(__file__),'CoveyLedger.json')))['abi']
+
+        # set the gas station url
+        self.gas_station_url = kwargs.get('gas_station_url','https://gasstation.polygon.technology/v2')
 
         # if posting only, we don't need to get the pricer and get alpaca involved
         if not self.posting_only:
@@ -125,9 +129,11 @@ class Trade:
         my_address = w3.toChecksumAddress(self.address)
         nonce = w3.eth.get_transaction_count(my_address,'pending')
         gas = covey_ledger.functions.createContent(positionString).estimate_gas({'from': my_address, 'nonce': nonce}) 
+        gas_price = requests.get(self.gas_station_url).json().get('fast').get('maxFee')
         txn = covey_ledger.functions.createContent(positionString).build_transaction({
             'chainId': int(self.polygon_chain_id),
             'gas': gas,
+            'gasPrice': Web3.toWei(str(round(float(gas_price))), 'gwei'),
             'nonce': nonce,
             'from': my_address
         })
@@ -443,8 +449,10 @@ if __name__ == '__main__':
               address_private = os.environ.get('WALLET_PRIVATE'),
               posting_only=True)
 
+    #requests.get('https://gasstation-mainnet.matic.network/v2').json()
     # post trades
-    #t.post_trades_polygon('UUP:0.25')
+    t.post_trades_polygon('GOOG:0.25')
+   
 
     # log how long it took
     print('---Trades for address {} finished in {} seconds ---'.format(t.address,time.time() - start_time))
