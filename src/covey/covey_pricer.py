@@ -85,7 +85,7 @@ class Pricer:
             request_params = StockBarsRequest(
                             symbol_or_symbols=self.us_equity_symbols,
                             timeframe=self.timeframe,
-                            start=self.start
+                            start=datetime.strptime(self.start,'%Y-%m-%d')
                     )
 
             # capture the bars list
@@ -124,7 +124,6 @@ class Pricer:
             print("Could not find prices for {} between {} and {}".format(symbol,start,end))
         
 
-
     async def get_equity_historic_database(self):
         # make sure we have equity symbols
         if len(self.us_equity_symbols) > 0:
@@ -149,7 +148,6 @@ class Pricer:
                     )
 
    
-
     # pulling crypto prices (no need to authenticate with public/private keys here)
     async def get_prices_crypto(self):
         # make sure we have crypt symbols
@@ -161,7 +159,7 @@ class Pricer:
             request_params = CryptoBarsRequest(
                             symbol_or_symbols=self.crypto_symbols,
                             timeframe=self.timeframe,
-                            start=self.start
+                            start=datetime.strptime(self.start,'%Y-%m-%d')
                     )
 
             # capture the bars list

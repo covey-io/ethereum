@@ -10,12 +10,14 @@ from dotenv import load_dotenv
 from eth_account import account
 from datetime import datetime, timedelta
 from web3.middleware import geth_poa_middleware
-from alpaca.trading import TradingClient
+from alpaca.trading.client import TradingClient
 
 # # covey libraries - internal test
 # from utils import get_data, get_output, get_checks
 # from covey_pricer import Pricer
 # from covey_calendar import CoveyCalendar
+# from alpaca.trading.requests import GetAssetsRequest
+# from alpaca.trading.enums import AssetClass, AssetExchange
 
 # covey libraries - packaging
 from covey import get_data, get_output
@@ -186,6 +188,10 @@ class Trade:
         # initialized trading client
         b = TradingClient(api_key = os.environ.get('APCA_API_KEY_ID'), secret_key = os.environ.get('APCA_API_SECRET_KEY'))
         # get the 'list' of assets
+        # search for crypto assets
+        #search_params = GetAssetsRequest(asset_exchange='NYSE')
+        #assets = b.get_all_assets(search_params)
+        
         asset_list = b.get_all_assets()
         # put the instance dict() into a dataframe
         asset_df = pd.DataFrame([a.dict() for a in asset_list])
@@ -451,7 +457,8 @@ if __name__ == '__main__':
 
     #requests.get('https://gasstation-mainnet.matic.network/v2').json()
     # post trades
-    t.post_trades_polygon('GOOG:0.25')
+    #t.post_trades_polygon('GOOG:0.25')
+    t.get_alpaca_universe()
    
 
     # log how long it took

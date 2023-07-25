@@ -460,7 +460,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     # initialize an example portfolio
-    p = Portfolio(address='0xB7059aEa8DE57329556a11Ed72dC1A392c0DF351')
+    p = Portfolio(address='0x763A38Ba9F4dAb8a03BB3A9f9a72147badDf56Ba')
 
     # calculate the portfolio from inception
     p.calculate_portfolio()
@@ -473,6 +473,7 @@ if __name__ == '__main__':
 
     # blockchain positions
     blockchain_positions = p.get_active_positions(current_time_stamp_clean)
+    print(blockchain_positions)
     
     # print statement announcing finish and run time taken
     print("---Portfolio finished in %s seconds ---" % (time.time() - start_time))
